@@ -8,7 +8,7 @@ In a production environment, a profanity filter needs to balance multiple object
 - **Player safety**: Prevent and reduce harm from hate speech, harassment, and other toxic behavior through automated detection
 - **Industry standards**: Follow gaming conventions where profanity is automatically censored
 - **Legal compliance**: There are many proposed regulations about online chat safety, particularly for children
-- **Platform requirements**: Satisfy certification requirements from Nintendo, Microsoft, and Sony
+- **Platform requirements**: Satisfy certification requirements from Nintendo, Microsoft, and Sony. Microsoft's requirement is publicly available at [XR-018](https://learn.microsoft.com/en-us/gaming/gdk/docs/store/policies/xr/xr018)
 
 ### Real-World Constraints
 The production system had to handle:
@@ -39,19 +39,24 @@ You'll build a simplified version of a production profanity filter, implementing
    - [GameTox dataset](https://github.com/shucoll/GameTox) - labeled gaming chat messages
    - [Reddit Usernames dataset](https://www.kaggle.com/datasets/colinmorris/reddit-usernames) - real usernames for testing. Note that these are not labeled as offensive or not
 
-2. Data exploration:
-   - Manually review samples from both datasets
-   - Write analysis scripts to understand distributions and patterns
+2. Start simple - single word detection:
+   - Write a script that counts what percentage of GameTox messages contain "damn"
+   - Manually review some of those messages - are they all actually toxic?
+   - Count how many messages your script flags (all messages with "damn")
+   - Count how many of those are actually labeled as toxic in GameTox (correct flags)
+   - Count how many are labeled as not toxic (incorrect flags)
 
 3. Build a regex-based profanity detector:
-   - Create or download a profanity word list
-   - Generate a regular expression to match profane words
+   - Start with a small list of profane words (5-10 words)
+   - Create a regular expression that matches any of those words
+   - Test it and observe the same counts as above: total flagged, correct flags, incorrect flags
+   - Expand your word list (download a profanity list or grow your hand-written one)
    - Binary classification: profane vs. clean (ignore GameTox's multiple categories for now)
 
-4. Evaluation:
-   - Test your filter on GameTox data and measure performance
-   - Review flagged Reddit usernames for false positives
-   - Attempt to bypass your own filter with creative misspellings
+4. Formal evaluation:
+   - Calculate accuracy, precision, and recall on GameTox data
+   - Review flagged Reddit usernames to find false positives
+   - Try to bypass your own filter with creative misspellings - what gets through?
 
 5. Baseline comparison:
    - Compare against [alt-profanity-check](https://github.com/dimitrismistriotis/alt-profanity-check)
@@ -62,6 +67,16 @@ You'll build a simplified version of a production profanity filter, implementing
 - Regular expressions
 - Working with real-world datasets (incomplete documentation, inherent biases)
 - Evaluation metrics (accuracy, precision) vs. traditional testing approaches
+
+**Terminology**
+- **Accuracy**: The percentage of predictions that are correct (both positive and negative). Can be misleading with imbalanced datasets.
+- **Precision**: Of all items flagged as positive, what percentage are actually positive? High precision means few false alarms.
+- **Recall**: Of all actual positive items, what percentage did we catch? High recall means we don't miss much.
+- **False positive**: An item incorrectly classified as positive (e.g., flagging "assessment" as profane).
+- **False negative**: An item incorrectly classified as negative (e.g., missing an actual profane message).
+- **Regular expression**: A pattern-matching language for finding text sequences (e.g., `\b(bad|worse|worst)\b` matches those exact words).
+- **Binary classification**: A task with exactly two possible outcomes (e.g., profane vs. clean).
+
 
 ### Level 2: LLM-Based Filter
 
@@ -79,15 +94,21 @@ You'll build a simplified version of a production profanity filter, implementing
    - Compare performance against your Level 1 solution
 
 **Extra Credit:**
+- Optimize prompts through systematic experimentation
 - Implement response caching to reduce average latency and cost
 - Use structured/JSON output mode for reliable parsing
-- Optimize prompts through systematic experimentation
 - Extend to multi-class classification (clean / profanity / insult / hate speech)
 
 **Key Learnings:**
 - LLM API integration and prompt engineering
 - Cost/latency tradeoffs in production ML systems
 - When LLMs are (and aren't) practical solutions
+
+**Terminology**
+- **Prompt engineering**: The process of designing and refining text instructions to get better results from LLMs. Small wording changes can significantly impact accuracy.
+- **Structured output**: Requesting LLMs to return responses in a specific format like JSON, making parsing more reliable than free-form text.
+- **Multi-class**: Classification with more than two categories (e.g., clean / profanity / insult / hate speech).
+- **Latency**: The time delay between sending a request and receiving a response. Critical for real-time applications like chat filtering.
 
 ### Level 3: Traditional ML Classifier
 
@@ -100,7 +121,7 @@ You'll build a simplified version of a production profanity filter, implementing
 2. Comprehensive evaluation:
    - Measure precision, recall, and F1-score on held-out test data
    - Compare against Levels 1 and 2 across multiple dimensions:
-     - Accuracy metrics
+     - Accuracy and other metrics
      - Latency (inference speed)
      - Memory footprint
      - External dependencies and costs
@@ -120,6 +141,16 @@ You'll build a simplified version of a production profanity filter, implementing
 - Precision, recall, F1-score, and when to optimize for each
 - Traditional ML as a practical middle ground between rules and LLMs
 
+**Terminology**
+- **Training vs testing data**: Training data is used to build the model; testing data evaluates how well it generalizes to unseen examples.
+- **Held-out data (same as testing data)**: Data deliberately set aside and not used during training, reserved exclusively for evaluation.
+- **F1-score, F-score, F-measure**: The harmonic mean of precision and recall, balancing both metrics. Commonly used instead of accuracy when the output is rare (most messages don't have profanity).
+- **Document frequency**: How many documents contain a particular word. Rare words (low DF) are often more informative than common ones.
+- **TF-IDF**: Term Frequency-Inverse Document Frequency; weights words by how often they appear in a document relative to how rare they are overall. Reduces impact of common words like "the".
+- **Stop words**: Extremely common words ("the", "a", "is") that are often removed because they add little meaning. May or may not help depending on your task.
+- **Ngram**: A sequence of N consecutive words (or characters). Bigrams (2-grams) like "very bad" can capture meaning that single words miss.
+- **Logistic regression**: A simple but effective classification algorithm that learns weights for features and outputs a probability. Despite its name, it's used for classification, not regression.
+
 ### Level 4: Advanced Directions
 
 Choose one or more extensions based on your interests:
@@ -138,4 +169,9 @@ Choose one or more extensions based on your interests:
 
 **Deployment & Engineering:**
 - Package your solution as an installable Python library
-- Build a REST API for real-time filtering
+- Build a web API for real-time filtering
+
+**Terminology**
+- **Fine-tuning**: Taking a pre-trained model and continuing to train it on your specific dataset. Leverages existing knowledge while specializing to your task.
+- **Transformer**: A neural network architecture using attention mechanisms to process sequences. The foundation for BERT, GPT, and most modern LLMs.
+- **Generative**: Models that produce new text rather than just classifying existing text. Can "rewrite" profane messages into clean versions rather than just detecting them.
