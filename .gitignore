@@ -205,3 +205,9 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# The data files may be large, don't commit those to git
+data/**
+
+# OpenRouter API key, etc shouldn't be committed to git
+.env
