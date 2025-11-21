@@ -1,98 +1,142 @@
-# Tek Innovators: Profanity Filter
+# Tek Innov8rs: Profanity Filter
 
 ## Context
-This project is similar to work we did at Singularity 6 for the game Palia, which is an online game on PC/Steam, Switch, Xbox, and Playstation. The game involves multiplayer coordination and communication and is still available.
+This project is based on real-world work done at Singularity 6 for the game [Palia](https://palia.com/), a multiplayer online game available on PC/Steam, Switch, Xbox, and PlayStation.
 
-We had many goals regarding profanity and toxicity:
-- Prevent and reduce harm of hate speech, harassment, and any other online harm. If possible we wanted to catch those harmful behaviors automatically rather than relying solely on the moderation team
-- Adhere to common practices in gaming in which profanity is bleeped out
-- Adhere to various laws around children playing games TODO
-- Adhere to the certification requirements of Nintendo, Microsoft, and Sony (many of which are private)
+### Project Goals
+In a production environment, a profanity filter needs to balance multiple objectives:
+- **Player safety**: Prevent and reduce harm from hate speech, harassment, and other toxic behavior through automated detection
+- **Industry standards**: Follow gaming conventions where profanity is automatically censored
+- **Legal compliance**: There are many proposed regulations about online chat safety, particularly for children
+- **Platform requirements**: Satisfy certification requirements from Nintendo, Microsoft, and Sony
 
-Some of the constaints of the game to consider:
-- The game was worldwide. Our most commonly used languages were English, German, Spanish, Dutch, Portuguese, French, Russian, Chinese, Japanese, and Hungarian (if I remember correctly).
-- English profanity was frequently used in other languages
-- Chat was shared between all players on a given server and would mix players from different languages.
-- We had to process about 1,000,000 messages per day and the messages were just plain text.
+### Real-World Constraints
+The production system had to handle:
+- **Global scale**: Support for 10+ languages including English, German, Spanish, Dutch, Portuguese, French, Russian, Chinese, Japanese, and Hungarian
+- **Cross-language profanity**: English curse words frequently appeared in other language contexts
+- **Multilingual servers**: Chat rooms mixed players from different language backgrounds
+- **High volume**: Approximately 1 million chat messages per day
 
-User experience considerations:
-- Players shouldn't be allowed to create offensive usernames, and it should be clear why. For example, if a username like "cass" is blocked for profanity that can be confusing if it's not explained that it's because of "ass"
-- The convention is to star out bad words in chat. This is helpful if the filter flags something incorrectly, as in ***essment.
-- People in games often try to circumvent filters in creative ways by using deliberate misspellings or uncommon Unicode characters.
+### User Experience Considerations
+- **Username filtering**: Blocked usernames need clear explanations (e.g., "cass" blocked due to substring "ass")
+- **Visual feedback**: Star out flagged words in chat (e.g., `***essment`) so users can identify false positives
+- **Adversarial behavior**: Users actively attempt to bypass filters using leetspeak, misspellings, and Unicode characters
 
-## This project
-This project is to approximate what we needed for Palia, but in a few different levels. Write it in Python. You can use Jupyter notebooks as needed but the majority of your code should be in CLI scripts.
+## Project Overview
+You'll build a simplified version of a production profanity filter, implementing progressively more sophisticated approaches. All code should be written in Python, primarily as CLI scripts (Jupyter notebooks are acceptable for exploration and analysis).
 
-### Learning goals
+### Learning Objectives
 
-- Build an understanding of the spectrum of solutions from rule-based solutions to traditional machine learning to applications of large language models. What are the tradeoffs involved? When does each approach shine?
-- Basics of applied machine learning for text classification
-- Basics of applying LLM APIs
-- Get some experience with text data, unicode, etc
+- **Solution spectrum**: Understand tradeoffs between rule-based systems, traditional ML, and LLMs. When does each approach excel?
+- **Text classification**: Gain hands-on experience with applied machine learning for NLP tasks
+- **LLM integration**: Learn to work with LLM APIs effectively
+- **Text processing**: Handle real-world challenges with Unicode, multilingual data, and noisy text
 
-### Level 1: Explore some data, build a basic rule-based filter
+### Level 1: Rule-Based Filter
 
-- Download the [GameTox dataset](https://github.com/shucoll/GameTox) to the `data/` dir
-- Download the [Reddit Usernames dataset](https://www.kaggle.com/datasets/colinmorris/reddit-usernames) to the `data/` dir
-- Explore and understand the data, both manually and using scripts to run analysis
-- Build a basic detector that identifies whether a message has English profanity in it. Implement it by building a regex from a profanity list (either a small hand-written one, or a dynamically-generated regex from a downloaded list)
-- Evaluate the filter on the GameTox data, comparing against filtering nothing. Note that the GameTox data has many categories and you only want to classify text as profane or not at this level
-- Review Reddit usernames that are flagged by your filter
-- Try to circumvent your own filter
-- Compare against any existing Python libraries: 
-    - [alt-profanity-check](https://github.com/dimitrismistriotis/alt-profanity-check): An updated version of the old, abandoned profanity-check
+**Tasks:**
+1. Download datasets to `data/` directory:
+   - [GameTox dataset](https://github.com/shucoll/GameTox) - labeled gaming chat messages
+   - [Reddit Usernames dataset](https://www.kaggle.com/datasets/colinmorris/reddit-usernames) - real usernames for testing. Note that these are not labeled as offensive or not
 
-**Definition of done**
+2. Data exploration:
+   - Manually review samples from both datasets
+   - Write analysis scripts to understand distributions and patterns
 
-As you work to improve your filter, over time you'll find that it's tough to block bad text without accidentally blocking good text. That's a good sign to move on.
+3. Build a regex-based profanity detector:
+   - Create or download a profanity word list
+   - Generate a regular expression to match profane words
+   - Binary classification: profane vs. clean (ignore GameTox's multiple categories for now)
 
-#### To learn
+4. Evaluation:
+   - Test your filter on GameTox data and measure performance
+   - Review flagged Reddit usernames for false positives
+   - Attempt to bypass your own filter with creative misspellings
 
-- Basic regular expressions
-- Gain experience with semi-documented data sets, bias in data, etc
-- Gain experience with evaluation (and how it differs from unit testing or other testing). Begin to learn about evaluation metrics like accuracy
+5. Baseline comparison:
+   - Compare against [alt-profanity-check](https://github.com/dimitrismistriotis/alt-profanity-check)
 
-### Level 2: Build a basic LLM-based filter
+**Definition of Done:** When you observe the classic precision/recall tradeoff (blocking offensive content inevitably catches some innocent text) you're ready to move on.
 
-- Implement an alternative filter based on an online LLM. Use [OpenRouter](https://openrouter.ai/) if you don't already have a preferred provider because they have some free LLMs
-- Compare/contrast against your other solution(s)
-- Compare/contrast different LLMs, such as openai/gpt-oss-20b:free, x-ai/grok-4.1-fast, meta-llama/llama-3.3-70b-instruct:free. Which is best?
-- Estimate the cost for running this on 1 million messages per day with a paid model such as openai/gpt-5.1
+**Key Learnings:**
+- Regular expressions
+- Working with real-world datasets (incomplete documentation, inherent biases)
+- Evaluation metrics (accuracy, precision) vs. traditional testing approaches
 
-**Extra credit**
-- Build a caching layer to reduce cost and latency
-- Use structured output with the LLM
-- Optimize your prompt
-- Experiment with multiple categories, such clean vs profanity vs insult
+### Level 2: LLM-Based Filter
 
-#### To learn
-- Experience calling LLMs
-- Understanding of cost and latency challenges with LLMs
+**Tasks:**
+1. Implement an LLM-powered profanity detector:
+   - Use [OpenRouter](https://openrouter.ai/) for easy access to free models
+   - Design an effective prompt for binary classification
 
-### Level 3: Build a traditional text classifier
+2. Model comparison:
+   - Test multiple models (e.g., `openai/gpt-oss-20b:free`, `x-ai/grok-4.1-fast`, `meta-llama/llama-3.3-70b-instruct:free`)
+   - Compare accuracy, speed, and behavior across models
 
-- Implement a basic scikit-learn filter based on the GameTox data. Note that you'll need to decide on a train/test split for this.
-- Compare/contrast against the other options in terms of latency, memory use, external costs, and your evaluation metrics
+3. Production feasibility:
+   - Calculate costs for processing 1M messages/day with a paid model (e.g., `openai/gpt-5.1`)
+   - Compare performance against your Level 1 solution
 
-#### Tutorials for reference
+**Extra Credit:**
+- Implement response caching to reduce average latency and cost
+- Use structured/JSON output mode for reliable parsing
+- Optimize prompts through systematic experimentation
+- Extend to multi-class classification (clean / profanity / insult / hate speech)
 
-- https://scikit-learn.org/stable/auto_examples/text/plot_document_classification_20newsgroups.html
-- https://www.geeksforgeeks.org/nlp/text-classification-using-scikit-learn-in-nlp/
+**Key Learnings:**
+- LLM API integration and prompt engineering
+- Cost/latency tradeoffs in production ML systems
+- When LLMs are (and aren't) practical solutions
 
-#### To learn
+### Level 3: Traditional ML Classifier
 
-- More thorough evaluation: train/test split, precision, recall, F-score
+**Tasks:**
+1. Train a scikit-learn text classifier:
+   - Split GameTox data into training and test sets
+   - Choose appropriate features. Start with TfidfVectorizer(ngram_range=(1, 1))
+   - Train a classifier. Start with LogisticRegression
 
-**Extra credit**
-- Use a scikit-learn pipeline to package
+2. Comprehensive evaluation:
+   - Measure precision, recall, and F1-score on held-out test data
+   - Compare against Levels 1 and 2 across multiple dimensions:
+     - Accuracy metrics
+     - Latency (inference speed)
+     - Memory footprint
+     - External dependencies and costs
 
-### Level 4: Choose your own adventure!
+**Helpful Resources:**
+- [scikit-learn text classification tutorial](https://scikit-learn.org/stable/auto_examples/text/plot_document_classification_20newsgroups.html)
+- [GeeksforGeeks NLP classification guide](https://www.geeksforgeeks.org/nlp/text-classification-using-scikit-learn-in-nlp/)
 
-- Fine-tune a BERT-based model to it, like [ModernBert](https://huggingface.co/blog/modernbert)
-- Compare against [toxic-bert](https://huggingface.co/unitary/toxic-bert)
-- Try the same code on a different data set. See `docs/Perplexity_note.md` for some ideas
-- Support languages other than English: This will be easier if you use LLMs or multilingual BERT variants BUT be careful about the data set quality if it's a language you don't know!
-- Add a detector for hate speech, harassment, and other harmful behaviors (key consideration: Should our system handle curse words differently than hate speech?)
-- Machine learning approaches to bleeping out profanity: You can use BERT or similar models to solve this as sequence labeling (classify each token as toxic/not). You can also use generative models like T5 to do the same.
-- Fine-tune a LLM for this to get a smaller/cheaper model to work as well as a big one
-- Wrap your code in a Python package that someone else could import
+**Extra Credit:**
+- Package your model in a scikit-learn Pipeline for cleaner deployment
+- Experiment with hyperparameters:
+    - TfidfVectorizer: analyzer=word vs char, ngram_range=(1, 2), min_df=1, 2, 3, and so on
+    - LogisticRegression: Try different C values
+
+**Key Learnings:**
+- Train/test methodology and avoiding overfitting
+- Precision, recall, F1-score, and when to optimize for each
+- Traditional ML as a practical middle ground between rules and LLMs
+
+### Level 4: Advanced Directions
+
+Choose one or more extensions based on your interests:
+
+**ML/AI Approaches:**
+- Fine-tune a transformer model like [ModernBERT](https://huggingface.co/blog/modernbert) on your dataset
+- Benchmark against pre-trained models like [toxic-bert](https://huggingface.co/unitary/toxic-bert)
+- Fine-tune an LLM to match GPT-4 performance at lower cost/latency
+- Implement sequence labeling to identify which specific tokens to censor
+- Compare token-level approaches (BERT) vs. generative approaches (T5)
+- Distinguish between profanity, hate speech, and harassment (should these be handled differently in the game?)
+
+**Multilingual Support:**
+- Extend to non-English languages using multilingual BERT or LLMs
+- **Important**: Validate data quality carefully for languages you don't speak
+
+**Deployment & Engineering:**
+- Package your solution as an installable Python library
+- Build a REST API for real-time filtering
+- Evaluate on additional datasets (see `docs/Perplexity_note.md` for options)
