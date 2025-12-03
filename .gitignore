@@ -211,3 +211,6 @@ data/**
 
 # OpenRouter API key, etc shouldn't be committed to git
 .env
+
+# Mac system files
+.DS_Store
