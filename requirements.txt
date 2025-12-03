@@ -1,0 +1,13 @@
+# OpenAI SDK (for OpenRouter API access)
+openai
+
+# Environment variable management
+python-dotenv
+
+# Data processing
+pandas
+numpy
+
+# Data visualization (for future analysis)
+matplotlib
+seaborn
