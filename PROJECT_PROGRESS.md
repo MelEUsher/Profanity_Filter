@@ -16,7 +16,7 @@
 
 ### Environment
 - **OS:** Mac
-- **Python Version:** [Fill in]
+- **Python Version:** 3.13.9
 - **Virtual Environment:** venv/
 - **Repository:** https://github.com/MelEUsher/Profanity_Filter
 
